@@ -114,7 +114,7 @@ Thông qua 5 chương nghiên cứu liền mạch, dự án áp dụng **lượn
 
 # Chương 1: Giới thiệu & Đặt vấn đề
 
-> *"Mỗi parameter trong mô hình ngôn ngữ lớn là một linh hồn nhỏ bé mang 2 bytes ký ức. Khi bạn nhân con số ấy với 7 tỷ, bạn nhận ra rằng gã khổng lồ Transformer không thể vừa với thế giới thực — trừ khi bạn học cách uốn cong không gian."*
+Chương này trình bày bối cảnh nghiên cứu, định nghĩa bài toán, mục tiêu và cấu trúc của báo cáo.
 
 ---
 
@@ -256,13 +256,13 @@ Chương 5: Triển khai & Kết luận
     → "Làm thế nào để deploy? Tổng kết và hướng phát triển"
 ```
 
-> **Chương 2** sẽ xây dựng nền tảng kiến thức cần thiết để hiểu các phương pháp tối ưu — từ kiến trúc Transformer đến các kỹ thuật quantization và serving hiện có.
+Chương 2 sẽ trình bày nền tảng kiến thức cần thiết để hiểu các phương pháp tối ưu hóa, bao gồm kiến trúc Transformer và các kỹ thuật quantization, serving hiện có.
 
 ---
 
 # Chương 2: Nền tảng kiến thức & Tổng quan tài liệu
 
-> *"Để chinh phục gã khổng lồ, trước hết phải hiểu hắn. Chương này là bản đồ giải phẫu của Transformer — kiến trúc bên trong cỗ máy mà chúng ta sẽ tối ưu."*
+Chương này giới thiệu kiến trúc Transformer, các kỹ thuật tối ưu hóa đã biết, và tổng quan các nghiên cứu liên quan nhằm xác định khoảng trống nghiên cứu.
 
 ---
 
@@ -308,7 +308,7 @@ Trong đó:
 └─────────────────────────────────────────────┘
 ```
 
-### 2.1.2 Tại sao Attention là "cổ chai" về bộ nhớ
+### 2.1.2 Tại sao Attention là điểm nghẽn về bộ nhớ
 
 Trong quá trình sinh văn bản, mỗi token cần lưu trữ Key và Value tensors — gọi là **KV Cache**. Kích thước KV Cache:
 
@@ -338,7 +338,7 @@ LM Head → Logits
     ↓
 Sampling → Output Token
     ↓
-Loop lại cho token tiếp theo
+Lặp lại cho token tiếp theo
 ```
 
 **Điểm nóng tính toán:**
@@ -435,13 +435,13 @@ Dựa trên tổng quan tài liệu, các khoảng trống nghiên cứu đượ
 | **Thiếu hướng dẫn end-to-end** | Tài liệu rời rạc, thiếu pipeline hoàn chỉnh | Hướng dẫn từ quantization đến production deployment |
 | **Thiếu phân tích cost-benefit** | Ít so sánh chi phí giữa các GPU tier | Phân tích chi tiết cost-per-token, TCO |
 
-> **Chương 3** sẽ đi sâu vào phương pháp tối ưu hóa cụ thể — từ tầng mô hình đến tầng hệ thống — với lý thuyết, implementation, và trade-off analysis.
+Chương 3 sẽ trình bày chi tiết các phương pháp tối ưu hóa cụ thể --- từ tầng mô hình đến tầng hệ thống --- bao gồm lý thuyết, triển khai, và phân tích trade-off.
 
 ---
 
 # Chương 3: Phương pháp tối ưu hóa
 
-> *"Nếu mỗi parameter là một giọt mực, thì lượng tử hóa là nghệ thuật pha loãng — giữ lại hồn cốt của câu chuyện trong khi đổ đi 75% dung dịch thừa. Chương này trình bày ba lớp tối ưu hóa: thu nhỏ mô hình, tăng tốc inference, và thiết kế hệ thống."*
+Chương này trình bày ba lớp phương pháp tối ưu hóa: tối ưu hóa tại tầng mô hình (lượng tử hóa), tối ưu hóa tại tầng suy luận (PagedAttention, Continuous Batching), và tối ưu hóa tại tầng hệ thống (framework, caching).
 
 ---
 
@@ -723,13 +723,13 @@ Client Request
 └─────────────┘     └─────────────┘
 ```
 
-> **Chương 4** sẽ đánh giá thực nghiệm tất cả các phương pháp trên — với benchmark cụ thể trên GPU T4, so sánh trade-off giữa quality, speed, và memory.
+Chương 4 sẽ đánh giá thực nghiệm tất cả các phương pháp trên với benchmark cụ thể trên GPU T4, đồng thời so sánh trade-off giữa chất lượng, tốc độ, và bộ nhớ.
 
 ---
 
 # Chương 4: Đánh giá thực nghiệm
 
-> *"Lý thuyết cho ta bản đồ, nhưng chỉ thực nghiệm mới cho ta biết con đường nào thực sự đi được. Chương này là cuộc kiểm chứng — nơi mỗi giả thiết được đặt trước bàn cân của dữ liệu."*
+Chương này trình bày thiết kế thực nghiệm, kết quả benchmark, và phân tích trade-off giữa các phương pháp tối ưu hóa.
 
 ---
 
@@ -811,8 +811,8 @@ def benchmark_inference(model, tokenizer, prompt, n_tokens=100):
 
 **Nhận xét:**
 - INT4-NF4 giảm **81% VRAM** với chỉ **~5.4% perplexity increase**
-- FP16 là "free lunch" — giảm 50% VRAM, không mất chất lượng
-- INT8 là sweet spot cho quality-sensitive applications
+- FP16 giảm 50% VRAM mà không ảnh hưởng đến chất lượng
+- INT8 là lựa chọn tối ưu cho các ứng dụng yêu cầu chất lượng cao
 
 ### 4.2.2 So sánh các phương pháp Quantization
 
@@ -854,7 +854,7 @@ Perplexity (càng thấp càng tốt)
 |-----------|------|----------|---|
 | Perplexity | 12.45 | 13.12 | +5.4% |
 | MMLU (ước tính) | 45.2% | 43.8% | -3.1% |
-| Generation quality | Tốt | Tốt | Không đáng kể |
+| Generation quality | Tốt | Tốt | Không thay đổi đáng kể |
 
 **Kết luận:** INT4 quantization chấp nhận được cho hầu hết use cases. Chỉ các ứng dụng yêu cầu độ chính xác tuyệt đối (y tế, pháp lý) mới cần INT8 hoặc FP16.
 
@@ -895,7 +895,7 @@ Perplexity (càng thấp càng tốt)
 | Trung bình (50-100) | 800ms | 400ms | -50% |
 | Dài (>100 tokens) | 1500ms | 1200ms | -20% |
 
-**Nhận xét:** Requests ngắn benefit nhiều nhất từ continuous batching — không phải đợi requests dài hoàn thành.
+**Đánh giá:** Các request có độ ngắn cải thiện nhiều nhất khi áp dụng continuous batching do không phải chờ đợi các request dài hoàn thành.
 
 ---
 
@@ -909,10 +909,10 @@ Perplexity (càng thấp càng tốt)
 
 | Framework | Req/s | Latency p50 | Latency p99 | VRAM | Cold Start | Ease of Use |
 |-----------|-------|-------------|-------------|------|------------|-------------|
-| vLLM | 25 | 150ms | 400ms | 8GB | 30s | ⭐⭐⭐ |
-| TGI | 20 | 180ms | 500ms | 8GB | 45s | ⭐⭐⭐⭐ |
-| llama.cpp | 15 | 200ms | 600ms | 6GB | 10s | ⭐⭐ |
-| FastAPI | 10 | 250ms | 800ms | 8GB | 20s | ⭐⭐⭐⭐⭐ |
+| vLLM | 25 | 150ms | 400ms | 8GB | 30s | Trung bình |
+| TGI | 20 | 180ms | 500ms | 8GB | 45s | Khá |
+| llama.cpp | 15 | 200ms | 600ms | 6GB | 10s | Thấp |
+| FastAPI | 10 | 250ms | 800ms | 8GB | 20s | Cao |
 
 **Hình 4.2: Throughput Comparison**
 
@@ -1002,13 +1002,13 @@ Sweet spot: INT4-NF4 + vLLM → PPL 13.12, 35 tok/s, 2.1GB VRAM
 | **Simulated load** | Sử dụng asyncio, không có real users | Không phản ánh chính xác production |
 | **Dataset** | Không có Vietnamese benchmark | Chưa đánh giá cho tiếng Việt |
 
-> **Chương 5** sẽ trình bày hướng dẫn triển khai thực tế, kiến trúc microservices production, và kết luận toàn bộ nghiên cứu.
+Chương 5 sẽ trình bày hướng dẫn triển khai thực tế, kiến trúc microservices production, đánh giá tổng kết, và kết luận toàn bộ nghiên cứu.
 
 ---
 
 # Chương 5: Triển khai & Kết luận
 
-> *"Mọi phát minh vĩ đại đều vô nghĩa nếu nó chỉ nằm trong phòng thí nghiệm. Chương cuối cùng này là câu chuyện đưa gã khổng lồ đã thu nhỏ, đã được huấn luyện, đã biết cách phục vụ — ra trước thế giới."*
+Chương này trình bày hướng dẫn triển khai thực tế, kiến trúc microservices production, đánh giá tổng kết, và kết luận nghiên cứu.
 
 ---
 
@@ -1077,31 +1077,31 @@ curl http://localhost:8000/v1/completions \
 | **C: GPU 16GB** | T4/RTX 4060 Ti | AWQ-4bit + vLLM | 25-30 req/s |
 | **D: 2x GPU** | 2x T4 | Tensor Parallelism + AWQ | 40-50 req/s |
 
-### 5.1.3 Best Practices và Pitfalls
+### 5.1.3 Các khuyến nghị và lưu ý
 
-**✅ Nên làm:**
+**Khuyến nghị:**
 1. Benchmark trên hardware mục tiêu trước khi deploy
-2. Sử dụng AWQ cho production (nhanh, chất lượng tốt)
+2. Sử dụng AWQ cho production (tốc độ nhanh, chất lượng đảm bảo)
 3. Bật PagedAttention với `gpu-memory-utilization=0.9`
-4. Implement health checks cho production
-5. Monitor GPU utilization và latency
-6. Sử dụng Redis caching cho repeated queries
-7. Set appropriate TTL cho cache (1-24 giờ)
-8. Dùng multi-stage Docker builds để giảm image size
-9. Implement graceful shutdown
-10. Log metrics cho debugging
+4. Triển khai health checks cho môi trường production
+5. Giám sát GPU utilization và latency liên tục
+6. Sử dụng Redis caching cho các truy vấn lặp lại
+7. Cấu hình TTL phù hợp cho cache (1--24 giờ)
+8. Sử dụng multi-stage Docker builds để giảm kích thước image
+9. Triển khai graceful shutdown
+10. Ghi log metrics phục vụ debugging
 
-**❌ Cần tránh:**
+**Các lưu ý cần tránh:**
 1. Quantize mà không benchmark perplexity
-2. Sử dụng FP16 trên GPU <16GB (sẽ OOM)
-3. Bỏ qua KV Cache management
-4. Không có rate limiting
+2. Sử dụng FP16 trên GPU có VRAM $<$16GB (gây OOM)
+3. Bỏ qua quản lý KV Cache
+4. Không triển khai rate limiting
 5. Deploy mà không có health check
-6. Cache mọi thứ (dùng quá nhiều RAM)
-7. Không test với load thực tế
-8. Sử dụng default config mà không tune
-9. Bỏ qua error handling
-10. Không có monitoring/alerting
+6. Cache quá nhiều dữ liệu (dùng quá nhiều RAM)
+7. Không kiểm thử với tải thực tế
+8. Sử dụng cấu hình mặc định mà không tinh chỉnh
+9. Bỏ qua xử lý lỗi
+10. Không có giám sát và cảnh báo
 
 ---
 
@@ -1251,10 +1251,10 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 | A100 | $3.00 | $2,160 | -83% |
 | H100 | $8.00 | $5,760 | -94% |
 
-**Phân tích ROI:**
-- Chi phí T4: $360/tháng → Phục vụ 100+ users
-- Chi phí/user: $3.6/tháng
-- So với OpenAI API ($0.01/1K tokens): Self-hosted rẻ hơn 5-10x cho workload >1M tokens/tháng
+**Phân tích chi phí đầu tư:**
+- Chi phí T4: \$360/tháng, phục vụ hơn 100 users
+- Chi phí trên mỗi user: \$3.6/tháng
+- So với OpenAI API (\$0.01/1K tokens): Giải pháp self-hosted tiết kiệm hơn 5--10 lần cho khối lượng công việc lớn hơn 1 triệu tokens/tháng
 
 ### 5.3.4 Trả lời câu hỏi nghiên cứu
 
@@ -1275,11 +1275,11 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 | Kỹ năng | Mô tả | Mức độ |
 |---------|-------|--------|
-| **LLM Inference** | Transformer architecture, attention mechanisms, KV cache | ⭐⭐⭐⭐⭐ |
-| **Quantization** | GPTQ, AWQ, GGUF, bitsandbytes | ⭐⭐⭐⭐⭐ |
-| **Serving** | vLLM, PagedAttention, continuous batching | ⭐⭐⭐⭐ |
-| **API Development** | FastAPI, Redis caching, async programming | ⭐⭐⭐⭐ |
-| **DevOps** | Docker, GPU containers, monitoring | ⭐⭐⭐⭐ |
+| **LLM Inference** | Transformer architecture, attention mechanisms, KV cache | Thành thạo |
+| **Quantization** | GPTQ, AWQ, GGUF, bitsandbytes | Thành thạo |
+| **Serving** | vLLM, PagedAttention, continuous batching | Khá |
+| **API Development** | FastAPI, Redis caching, async programming | Khá |
+| **DevOps** | Docker, GPU containers, monitoring | Khá |
 
 ### 5.4.2 Hướng phát triển tương lai
 
@@ -1306,12 +1306,12 @@ Qua 5 chương nghiên cứu, dự án đã đạt được:
 
 ### 5.5.2 Ý nghĩa dự án
 
-> *"Từ GPU 16GB tưởng chừng bỏ đi, chúng tôi đã xây dựng một hệ thống phục vụ 100+ người dùng đồng thời, với chi phí chỉ $0.5/giờ — rẻ hơn 16 lần so với giải pháp truyền thống."*
+Dự án đã xây dựng một hệ thống LLM serving trên GPU T4, phục vụ 100+ người dùng đồng thời với chi phí \$0.5/giờ --- thấp hơn 16 lần so với giải pháp sử dụng H100.
 
 Dự án chứng minh rằng:
-- **Kiến thức có thể bù đắp tài nguyên** — không cần A100 hay H100 để deploy LLM production
-- **Lượng tử hóa là chìa khóa** — INT4 quantization mở ra khả năng chạy LLM 7B trên GPU consumer
-- **Kiến trúc đúng quan trọng hơn hardware** — PagedAttention + Continuous Batching + Caching tạo ra pipeline tối ưu
+- Kiến thức về tối ưu hóa có thể bù đắp sự hạn chế về tài nguyên phần cứng
+- INT4 quantization là giải pháp then chốt để chạy LLM 7B trên GPU consumer
+- Thiết kế kiến trúc hệ thống đúng đắn có vai trò quan trọng hơn việc nâng cấp hardware
 
 ### 5.5.3 Khuyến nghị
 

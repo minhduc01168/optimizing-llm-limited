@@ -196,9 +196,7 @@ Container Start & N/A & $<$60s & Production Ready \\
 % ============================================================
 \chapter{Giới thiệu \& Đặt vấn đề}
 
-\begin{quote}
-\textit{``Mỗi parameter trong mô hình ngôn ngữ lớn là một linh hồn nhỏ bé mang 2 bytes ký ức. Khi bạn nhân con số ấy với 7 tỷ, bạn nhận ra rằng gã khổng lồ Transformer không thể vừa với thế giới thực --- trừ khi bạn học cách uốn cong không gian.''}
-\end{quote}
+Chương này trình bày bối cảnh nghiên cứu, định nghĩa bài toán, mục tiêu và cấu trúc của báo cáo.
 
 % ── 1.1 ──
 \section{Bối cảnh và động lực nghiên cứu}
@@ -358,9 +356,7 @@ Báo cáo được tổ chức thành 5 chương liền mạch, mỗi chương x
 % ============================================================
 \chapter{Nền tảng kiến thức \& Tổng quan tài liệu}
 
-\begin{quote}
-\textit{``Để chinh phục gã khổng lồ, trước hết phải hiểu hắn. Chương này là bản đồ giải phẫu của Transformer --- kiến trúc bên trong cỗ máy mà chúng ta sẽ tối ưu.''}
-\end{quote}
+Chương này giới thiệu kiến trúc Transformer, các kỹ thuật tối ưu hóa đã biết, và tổng quan các nghiên cứu liên quan nhằm xác định khoảng trống nghiên cứu.
 
 % ── 2.1 ──
 \section{Kiến trúc Transformer và LLM}
@@ -536,9 +532,7 @@ Thiếu phân tích cost-benefit & Ít so sánh chi phí & Phân tích chi tiế
 % ============================================================
 \chapter{Phương pháp tối ưu hóa}
 
-\begin{quote}
-\textit{``Nếu mỗi parameter là một giọt mực, thì lượng tử hóa là nghệ thuật pha loãng --- giữ lại hồn cốt của câu chuyện trong khi đổ đi 75\% dung dịch thừa.''}
-\end{quote}
+Chương này trình bày ba lớp phương pháp tối ưu hóa: tối ưu hóa tại tầng mô hình (lượng tử hóa), tối ưu hóa tại tầng suy luận (PagedAttention, Continuous Batching), và tối ưu hóa tại tầng hệ thống (framework, caching).
 
 % ── 3.1 ──
 \section{Tối ưu hóa tại tầng mô hình --- Lượng tử hóa}
@@ -719,9 +713,7 @@ redis_client.setex(cache_key, 3600, json.dumps(result))
 % ============================================================
 \chapter{Đánh giá thực nghiệm}
 
-\begin{quote}
-\textit{``Lý thuyết cho ta bản đồ, nhưng chỉ thực nghiệm mới cho ta biết con đường nào thực sự đi được.''}
-\end{quote}
+Chương này trình bày thiết kế thực nghiệm, kết quả benchmark, và phân tích trade-off giữa các phương pháp tối ưu hóa.
 
 % ── 4.1 ──
 \section{Thiết kế thực nghiệm}
@@ -961,9 +953,7 @@ Simulated load & Giả lập users (asyncio) & Không phản ánh chính xác pr
 % ============================================================
 \chapter{Triển khai \& Kết luận}
 
-\begin{quote}
-\textit{``Mọi phát minh vĩ đại đều vô nghĩa nếu nó chỉ nằm trong phòng thí nghiệm.''}
-\end{quote}
+Chương này trình bày hướng dẫn triển khai thực tế, kiến trúc microservices production, đánh giá tổng kết, và kết luận nghiên cứu.
 
 % ── 5.1 ──
 \section{Hướng dẫn triển khai thực tế}
@@ -1165,7 +1155,7 @@ Qua 5 chương nghiên cứu, dự án đã đạt được:
 \subsection{Ý nghĩa dự án}
 
 \begin{successbox}
-Từ GPU 16GB tưởng chừng bỏ đi, chúng tôi đã xây dựng một hệ thống phục vụ 100+ người dùng đồng thời, với chi phí chỉ \$0.5/giờ --- rẻ hơn 16 lần so với giải pháp truyền thống. Dự án chứng minh rằng \textbf{kiến thức có thể bù đắp tài nguyên} --- không cần A100 hay H100 để deploy LLM production.
+Dự án đã xây dựng một hệ thống LLM serving trên GPU T4, phục vụ hơn 100 người dùng đồng thời với chi phí \$0.5/giờ --- thấp hơn 16 lần so với giải pháp sử dụng H100. Dự án chứng minh rằng kiến thức về tối ưu hóa có thể bù đắp sự hạn chế về tài nguyên phần cứng.
 \end{successbox}
 
 \subsection{Khuyến nghị}
