@@ -40,16 +40,11 @@ pip install torch transformers pynvml matplotlib
 
 ### Phần 2: Benchmark nhiều models
 
-1. Chạy benchmark với các model khác nhau:
-   ```bash
-   python benchmark.py
-   ```
-
-2. Kết quả sẽ lưu vào `results/metrics.json`
-
-### Phần 3: Phân tích kết quả
-
-Hoàn thành `report_template.md` với kết quả thực nghiệm.
+`starter.py` đã tích hợp sẵn benchmark cho tất cả models trong hàm `run_all_benchmarks()`. Khi chạy `python starter.py`, script sẽ tự động:
+1. Load và benchmark từng model (distilgpt2, gpt2, gpt2-medium, gpt2-large, facebook/opt-1.3b)
+2. Đo VRAM, latency, model size cho mỗi model
+3. Lưu kết quả vào `results/metrics.json`
+4. In bảng SUMMARY ra terminal
 
 ## Metrics cần thu thập
 
@@ -72,11 +67,9 @@ Hoàn thành `report_template.md` với kết quả thực nghiệm.
 
 ## Files trong thư mục
 
-- `starter.py` - Code skeleton để hoàn thành
+- `starter.py` - Code skeleton chứa toàn bộ logic benchmark (load model, đo VRAM, inference latency, lưu kết quả)
 - `solution.py` - Reference implementation
-- `benchmark.py` - Script đánh giá metrics
-- `results/` - Thư mục chứa kết quả
-- `report_template.md` - Template cho technical report
+- `results/` - Thư mục chứa kết quả (tự động tạo khi chạy `starter.py`)
 
 ## Hướng dẫn chi tiết từng bước
 
@@ -118,7 +111,6 @@ Kết quả sẽ được lưu vào `results/metrics.json`. Kiểm tra:
 Sau khi hoàn thành, nộp:
 1. File `starter.py` đã hoàn thành
 2. File `results/metrics.json` chứa kết quả benchmark
-3. File `report_template.md` đã điền kết quả
 
 ## Kết quả đạt được
 
