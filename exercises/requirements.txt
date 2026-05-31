@@ -1,0 +1,42 @@
+# Core ML
+torch==2.1.0+cu118
+transformers==4.35.0
+accelerate==0.24.0
+tokenizers==0.15.0
+
+# Quantization
+bitsandbytes==0.41.1
+auto-gptq==0.5.0
+autoawq==0.1.7
+llama-cpp-python==0.2.20
+
+# Serving
+vllm==0.2.5
+fastapi==0.104.1
+uvicorn==0.24.0
+redis==5.0.1
+
+# Benchmark & Monitoring
+pynvml==11.5.0
+psutil==5.9.6
+prometheus-client==0.19.0
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# Load Testing
+locust==2.20.0
+aiohttp==3.9.1
+
+# Utilities
+numpy==1.24.0
+pandas==2.0.3
+matplotlib==3.7.2
+seaborn==0.12.2
+tqdm==4.66.1
+python-dotenv==1.0.0
+pyyaml==6.0.1
+
+# Docker
+docker==6.1.3

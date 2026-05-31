@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard: Continuous Batching & Lập Lịch Mức Độ Lặp</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --primary-color: #00bcd4;
+            --text-main: #e0e0e0;
+            --text-muted: #9e9e9e;
+            --border-color: #333;
+            --btn-hover: #0097a7;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background-color: var(--surface-color);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .nav-tabs button {
+            background: none;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-left: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .nav-tabs button.active, .nav-tabs button:hover {
+            background-color: var(--primary-color);
+            color: #000;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* View sections */
+        #slides-view, #lab-view {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        #lab-view {
+            display: none;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Slides styling */
+        .slide-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .slide {
+            background-color: var(--surface-color);
+            width: 80%;
+            max-width: 900px;
+            min-height: 400px;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .slide h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .slide ul {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--text-main);
+        }
+
+        .slide li {
+            margin-bottom: 12px;
+        }
+
+        .slide p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .slide table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .slide th, .slide td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+
+        .slide th {
+            background-color: #2a2a2a;
+            color: var(--primary-color);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .controls button {
+            background-color: var(--primary-color);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .controls button:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .controls button:disabled {
+            background-color: #555;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        #slide-counter {
+            font-size: 1.1rem;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Lab styling */
+        .exercise {
+            background-color: var(--surface-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff9800;
+        }
+        
+        .exercise h3 {
+            color: #ff9800;
+            margin-top: 0;
+        }
+
+        pre {
+            background-color: #181818;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            color: #a6e22e;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        code.comment { color: #75715e; }
+        code.keyword { color: #f92672; }
+        code.string { color: #e6db74; }
+
+        .solution-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .solution-btn:hover { background-color: #45a049; }
+
+        .solution-content {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Buổi 5: Continuous Batching & Lập lịch mức độ lặp</h1>
+        <div class="nav-tabs">
+            <button id="btn-slides" class="active" onclick="switchTab('slides')">Màn Hình Slide</button>
+            <button id="btn-lab" onclick="switchTab('lab')">Phòng Thực Hành (Lab)</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- KHU VỰC SLIDE -->
+        <div id="slides-view">
+            <div class="slide-container">
+                <!-- Slide 1 -->
+                <div class="slide active">
+                    <h2>Buổi 5: Continuous Batching: Tối ưu hóa hiệu suất GPU và lưu lượng xử lý (Throughput)</h2>
+                    <ul>
+                        <li><strong>Mục tiêu:</strong> Hiểu rõ sự khác biệt giữa lập lịch truyền thống và lập lịch hiện đại trong phục vụ LLM.</li>
+                        <li><strong>Trọng tâm:</strong> Cơ chế lập lịch mức độ lặp (Iteration-level scheduling) và kỹ thuật Chunked Prefill.</li>
+                    </ul>
+                </div>
+                
+                <!-- Slide 2 -->
+                <div class="slide">
+                    <h2>Sự bất cập của Static Batching (Batching tĩnh)</h2>
+                    <ul>
+                        <li><strong>Cơ chế cũ:</strong> Hệ thống phải chờ tất cả các yêu cầu trong một batch hoàn thành trước khi bắt đầu batch mới.</li>
+                        <li><strong>Vấn đề "Đuôi trễ" (Tail Latency):</strong> Nếu một request sinh 1000 token trong khi 7 request khác chỉ sinh 10 token, GPU sẽ phải chạy lãng phí công suất để chờ request dài nhất kết thúc.</li>
+                        <li><strong>Hậu quả:</strong> GPU thường xuyên rơi vào trạng thái nhàn rỗi (idle), làm giảm hiệu suất sử dụng tài nguyên.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="slide">
+                    <h2>Định nghĩa Continuous Batching</h2>
+                    <ul>
+                        <li><strong>Khái niệm:</strong> Còn được gọi là Iteration-level scheduling, là kỹ thuật cho phép thêm hoặc loại bỏ yêu cầu khỏi batch ngay sau mỗi bước lặp sinh token (iteration).</li>
+                        <li><strong>Nguyên lý:</strong> Ngay khi một yêu cầu kết thúc, một yêu cầu mới từ hàng đợi sẽ được đẩy vào vị trí trống đó ngay lập tức mà không cần khởi động lại toàn bộ batch.</li>
+                        <li><strong>Hiệu quả:</strong> Có thể cải thiện lưu lượng (throughput) lên đến <strong>23 lần</strong> so với cách làm cũ.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 4 -->
+                <div class="slide">
+                    <h2>Hai giai đoạn xử lý: Prefill vs. Decode</h2>
+                    <p>Hệ thống lập lịch phải xử lý hai loại tải công việc rất khác nhau:</p>
+                    <ul>
+                        <li><strong>Giai đoạn Prefill (Xử lý Input):</strong> Mô hình đọc toàn bộ prompt đầu vào song song để xây dựng KV Cache ban đầu. Đây là tác vụ <em>tối ưu cho tính toán song song</em> của GPU (Compute-bound).</li>
+                        <li><strong>Giai đoạn Decode (Sinh Output):</strong> Mô hình sinh từng token một theo cách tuần tự. Đây là tác vụ <em>bị giới hạn bởi băng thông bộ nhớ</em> (Memory-IO bound).</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 5 -->
+                <div class="slide">
+                    <h2>Cơ chế lập lịch mức độ lặp (Iteration-level Scheduling)</h2>
+                    <p>Bộ lập lịch (Scheduler) kiểm tra trạng thái sau <strong>mỗi bước sinh token</strong>.</p>
+                    <ul>
+                        <li><strong>Admit new work every step:</strong> Chấp nhận các yêu cầu mới vào batch tại mỗi bước thay vì đợi ranh giới batch.</li>
+                        <li><strong>Grow and shrink on the fly:</strong> Kích thước batch thay đổi linh hoạt dựa trên số lượng request hoàn thành hoặc bị hủy.</li>
+                    </ul>
+                    <p><em>=> Điều này giữ cho GPU luôn trong trạng thái làm việc gần như liên tục.</em></p>
+                </div>
+
+                <!-- Slide 6 -->
+                <div class="slide">
+                    <h2>Sự can thiệp giữa Prefill và Decode</h2>
+                    <ul>
+                        <li><strong>Vấn đề:</strong> Khi một request mới (Prefill) có prompt rất dài được đưa vào, nó có thể chiếm dụng toàn bộ tài nguyên GPU trong nhiều bước lặp.</li>
+                        <li><strong>Hậu quả:</strong> Các request đang ở giai đoạn Decode sẽ bị "đóng băng" (stall), dẫn đến hiện tượng trễ nhịp sinh token và làm tăng độ trễ giữa các token (TPOT - Time Per Output Token).</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 7 -->
+                <div class="slide">
+                    <h2>Giải pháp Chunked Prefill</h2>
+                    <ul>
+                        <li><strong>Khái niệm:</strong> Chia nhỏ các prompt dài thành các mảnh (chunks) nhỏ hơn.</li>
+                        <li><strong>Cơ chế:</strong> Thay vì xử lý toàn bộ prompt dài trong một lần, scheduler chỉ xử lý một mảnh mỗi iteration, xen kẽ với các bước Decode của những người dùng khác.</li>
+                        <li><strong>Lợi ích:</strong> Cân bằng giữa throughput và latency, đảm bảo trải nghiệm streaming mượt mà cho tất cả người dùng.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 8 -->
+                <div class="slide">
+                    <h2>Lợi ích đối với TTFT và TPS</h2>
+                    <ul>
+                        <li><strong>Giảm hàng đợi:</strong> Các request mới được đưa vào lịch trình nhanh hơn, giúp giảm đáng kể Time To First Token (TTFT).</li>
+                        <li><strong>Tận dụng tối đa tài nguyên:</strong> Các bước Decode được đóng gói chặt chẽ, giữ cho chỉ số Tokens Per Second (TPS) luôn ở mức cao bất kể độ dài prompt khác nhau.</li>
+                        <li><strong>Hấp thụ đột biến:</strong> Scheduler có khả năng hấp thụ các đợt lưu lượng truy cập lớn mà không tạo ra các khoảng trống nhàn rỗi lâu.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 9 -->
+                <div class="slide">
+                    <h2>Các giới hạn và Đánh đổi (Trade-offs)</h2>
+                    <ul>
+                        <li><strong>Áp lực bộ nhớ:</strong> Prompt và output càng dài thì KV Cache càng phình to, nếu không quản lý tốt sẽ gây ra lỗi OOM (Out Of Memory).</li>
+                        <li><strong>Công bằng vs. Tốc độ:</strong> Việc đóng gói quá mức có thể khiến các prompt dài bị "đói" tài nguyên (starvation) nếu không có quy tắc công bằng.</li>
+                        <li><strong>Hiện tượng Jitter:</strong> Độ dài đầu vào thay đổi có thể gây ra sự biến động nhỏ về thời gian sinh token.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 10 -->
+                <div class="slide">
+                    <h2>Tối ưu hóa bộ nhớ: Chia sẻ KV Cache</h2>
+                    <ul>
+                        <li>Continuous batching hoạt động hiệu quả nhất khi kết hợp với việc quản lý bộ nhớ thông minh.</li>
+                        <li>Hệ thống chia bộ nhớ cache thành các <strong>khối nhỏ và tái sử dụng chúng</strong> (giống PagedAttention) để các request mới không bị treo khi chờ bộ nhớ.</li>
+                        <li>Các khối đã hoàn thành sẽ được trả lại "pool" ngay lập tức.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 11 -->
+                <div class="slide">
+                    <h2>So sánh hiệu năng thực tế</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Chỉ số</th>
+                                <th>Static Batching</th>
+                                <th>Continuous Batching</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Throughput (Tokens/s)</td>
+                                <td>Thấp</td>
+                                <td>Cao hơn tới 23x</td>
+                            </tr>
+                            <tr>
+                                <td>GPU Utilization</td>
+                                <td>Thấp (nhiều khoảng trống)</td>
+                                <td>Rất cao (liên tục)</td>
+                            </tr>
+                            <tr>
+                                <td>Độ trễ trung bình</td>
+                                <td>Bị ảnh hưởng bởi request dài nhất</td>
+                                <td>Ổn định cho tất cả request</td>
+                            </tr>
+                            <tr>
+                                <td>Khả năng Streaming</td>
+                                <td>Khó tối ưu</td>
+                                <td>Tối ưu tuyệt vời</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Slide 12 -->
+                <div class="slide">
+                    <h2>Danh sách kiểm tra (Tuning Checklist)</h2>
+                    <p>Các bước để thiết lập batching hiệu quả:</p>
+                    <ul>
+                        <li><strong>Cap max_tokens:</strong> Giới hạn token đầu ra để tránh lãng phí ngân sách tính toán.</li>
+                        <li><strong>Sane context length:</strong> Sử dụng RAG để giữ prompt ngắn nhất có thể.</li>
+                        <li><strong>Pick batch limits:</strong> Chọn giới hạn batch đủ để GPU bận rộn nhưng tránh hiện tượng "thrashing" (tranh chấp tài nguyên).</li>
+                        <li><strong>Right-size hardware:</strong> Nếu lỗi OOM xảy ra thường xuyên, cần thêm VRAM hoặc dùng model nhỏ hơn.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 13 -->
+                <div class="slide">
+                    <h2>Các bài kiểm tra cần thực hiện (Validation)</h2>
+                    <p>Cách kiểm chứng hệ thống lập lịch:</p>
+                    <ul>
+                        <li><strong>Load ramp:</strong> Tăng dần số lượng request đồng thời và theo dõi TTFT/TPS.</li>
+                        <li><strong>Mixed prompts:</strong> Trộn lẫn prompt ngắn và dài để xem scheduler điều tiết ra sao.</li>
+                        <li><strong>Cancel storms:</strong> Gửi nhiều yêu cầu hủy để kiểm tra khả năng dọn dẹp cache.</li>
+                        <li><strong>Token caps:</strong> Xác minh các giới hạn token có hoạt động chính xác không.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 14 -->
+                <div class="slide">
+                    <h2>Giám sát các chỉ số quan trọng (Instrumentation)</h2>
+                    <p>Các metrics cần theo dõi tối thiểu:</p>
+                    <ul>
+                        <li><strong>TTFT</strong> (p50/p95) và <strong>TPS</strong> (p50/p95) dưới tải.</li>
+                        <li>Kích thước batch thực tế (<strong>Active batch size</strong>) và độ dài hàng đợi.</li>
+                        <li>Tỉ lệ sử dụng bộ nhớ GPU và tỉ lệ trúng Cache (<strong>Cache hit rate</strong>).</li>
+                        <li>Các mã lỗi: <strong>OOM</strong> (Out of Memory), Timeouts.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 15 -->
+                <div class="slide">
+                    <h2>Kết luận</h2>
+                    <ul>
+                        <li>Continuous batching không phải là phép màu, mà là cách <strong>quản lý tài nguyên khoa học</strong> để giữ GPU bận rộn và người dùng hạnh phúc.</li>
+                        <li>Đây là nền tảng cốt lõi để các framework như vLLM, TGI đạt được hiệu năng vượt trội trong môi trường sản xuất thực tế.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide Controls -->
+            <div class="controls">
+                <button id="prev-btn" onclick="changeSlide(-1)" disabled>❮ Trước</button>
+                <div id="slide-counter">1 / 15</div>
+                <button id="next-btn" onclick="changeSlide(1)">Tiếp ❯</button>
+            </div>
+        </div>
+
+        <!-- KHU VỰC THỰC HÀNH LẬP TRÌNH -->
+        <div id="lab-view">
+            <h2>Bài tập Thực hành Lập trình (Python)</h2>
+            <p>Học sinh hãy đọc kỹ yêu cầu và thử viết mã mô phỏng. Bấm "Xem Gợi ý/Đáp án" khi cần đối chiếu.</p>
+
+            <div class="exercise">
+                <h3>Bài 1: Tính toán lãng phí của Static Batching</h3>
+                <p><strong>Yêu cầu:</strong> Giả sử một Batch có sức chứa (Batch Size) = 4. Chúng ta nhận vào 4 requests với số lượng Token cần sinh (Decode) lần lượt là: <code>[10, 15, 8, 1000]</code>. Biết mỗi bước sinh token mất 1ms.</p>
+                <p>Hãy viết một hàm <code>calculate_static_waste(requests)</code> tính tổng số mili-giây (ms) mà các vị trí trong batch bị bỏ trống (nhàn rỗi) trong khi phải chờ request dài nhất kết thúc.</p>
+                
+                <button class="solution-btn" onclick="toggleSolution('sol-1')">Xem Gợi ý / Đáp án</button>
+                <div id="sol-1" class="solution-content">
+<pre>
+<code class="keyword">def</code> <code class="string">calculate_static_waste</code>(requests):
+    <code class="comment"># Trong Static Batching, thời gian chạy của batch = thời gian của request dài nhất.</code>
+    max_tokens = max(requests)
+    total_waste = 0
+    
+    <code class="keyword">for</code> req <code class="keyword">in</code> requests:
+        <code class="comment"># Số token chênh lệch chính là số nhịp lặp (iterations) mà slot đó bị rảnh rỗi</code>
+        waste = max_tokens - req
+        total_waste += waste
+        
+    <code class="keyword">return</code> total_waste
+
+requests = [10, 15, 8, 1000]
+print(<code class="string">f"Tổng thời gian lãng phí: {calculate_static_waste(requests)} ms"</code>)
+<code class="comment"># Output: Tổng thời gian lãng phí: 2967 ms (Cực kỳ kém hiệu quả!)</code>
+</pre>
+                </div>
+            </div>
+
+            <div class="exercise">
+                <h3>Bài 2: Mô phỏng Chunked Prefill đơn giản</h3>
+                <p><strong>Yêu cầu:</strong> Hệ thống của bạn giới hạn số Token tính toán tối đa trong 1 iteration (bước lặp) là <code>max_tokens_per_iter = 256</code> để tránh nghẽn GPU.</p>
+                <p>Bạn nhận được một Prompt dài có <code>prompt_length = 600</code> tokens. Hãy viết vòng lặp mô phỏng việc băm nhỏ prompt (Chunking) để xử lý qua từng iteration, in ra số token xử lý ở mỗi bước.</p>
+                
+                <button class="solution-btn" onclick="toggleSolution('sol-2')">Xem Gợi ý / Đáp án</button>
+                <div id="sol-2" class="solution-content">
+<pre>
+<code class="keyword">def</code> <code class="string">simulate_chunked_prefill</code>(prompt_length, max_tokens_per_iter=256):
+    tokens_remaining = prompt_length
+    iteration = 1
+    
+    print(<code class="string">f"Bắt đầu xử lý Prompt dài {prompt_length} tokens..."</code>)
+    <code class="keyword">while</code> tokens_remaining > 0:
+        <code class="comment"># Quyết định kích thước chunk trong bước lặp này</code>
+        chunk_size = min(tokens_remaining, max_tokens_per_iter)
+        
+        print(<code class="string">f"Iteration {iteration}: Xử lý chunk {chunk_size} tokens."</code>)
+        <code class="comment"># Cập nhật số token còn lại</code>
+        tokens_remaining -= chunk_size
+        iteration += 1
+        
+    print(<code class="string">"Hoàn thành giai đoạn Prefill, sẵn sàng Decode!"</code>)
+
+simulate_chunked_prefill(600)
+<code class="comment"># Output:
+# Iteration 1: Xử lý chunk 256 tokens.
+# Iteration 2: Xử lý chunk 256 tokens.
+# Iteration 3: Xử lý chunk 88 tokens.
+# Hoàn thành giai đoạn Prefill...</code>
+</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JS Cho Slideshow
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const counter = document.getElementById('slide-counter');
+
+        function updateControls() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if(index === currentSlide) slide.classList.add('active');
+            });
+            
+            counter.innerText = `${currentSlide + 1} / ${slides.length}`;
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateControls();
+        }
+
+        // JS Cho Tabs
+        function switchTab(tabName) {
+            document.getElementById('btn-slides').classList.remove('active');
+            document.getElementById('btn-lab').classList.remove('active');
+            
+            if (tabName === 'slides') {
+                document.getElementById('btn-slides').classList.add('active');
+                document.getElementById('slides-view').style.display = 'flex';
+                document.getElementById('lab-view').style.display = 'none';
+            } else {
+                document.getElementById('btn-lab').classList.add('active');
+                document.getElementById('slides-view').style.display = 'none';
+                document.getElementById('lab-view').style.display = 'block';
+            }
+        }
+
+        // JS Cho Exercises
+        function toggleSolution(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === "block") {
+                el.style.display = "none";
+            } else {
+                el.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>

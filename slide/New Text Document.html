@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard: Đóng gói Docker & GPU Orchestration</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --surface-color: #ffffff;
+            --primary-color: #1976d2;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-color: #e0e0e0;
+            --btn-hover: #1565c0;
+            --highlight: #ff9800;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background-color: var(--surface-color);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+        }
+
+        .nav-tabs button {
+            background: none;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-left: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .nav-tabs button.active, .nav-tabs button:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* View sections */
+        #slides-view, #lab-view {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        #lab-view {
+            display: none;
+            padding: 30px;
+            box-sizing: border-box;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Slides styling */
+        .slide-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .slide {
+            background-color: var(--surface-color);
+            width: 80%;
+            max-width: 900px;
+            min-height: 450px;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            display: none;
+            border-top: 5px solid var(--primary-color);
+        }
+
+        .slide.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .slide h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 12px;
+            font-size: 1.8rem;
+        }
+
+        .slide ul {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--text-main);
+        }
+
+        .slide li {
+            margin-bottom: 15px;
+        }
+
+        .slide p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .slide table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+
+        .slide th, .slide td {
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            text-align: left;
+        }
+
+        .slide th {
+            background-color: #f0f4f8;
+            color: var(--primary-color);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .controls button {
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            margin: 0 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        .controls button:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .controls button:active {
+            transform: scale(0.98);
+        }
+
+        .controls button:disabled {
+            background-color: #cccccc;
+            color: #888888;
+            cursor: not-allowed;
+        }
+
+        #slide-counter {
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-width: 90px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* Lab styling */
+        .exercise {
+            background-color: var(--surface-color);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--highlight);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .exercise h3 {
+            color: var(--highlight);
+            margin-top: 0;
+            font-size: 1.4rem;
+        }
+
+        pre {
+            background-color: #282c34;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            color: #abb2bf;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        code.comment { color: #5c6370; font-style: italic; }
+        code.keyword { color: #c678dd; }
+        code.string { color: #98c379; }
+        code.docker-cmd { color: #e5c07b; }
+
+        .solution-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        .solution-btn:hover { background-color: #45a049; }
+
+        .solution-content {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Buổi 8: Đóng gói Docker & GPU Orchestration</h1>
+        <div class="nav-tabs">
+            <button id="btn-slides" class="active" onclick="switchTab('slides')">Trình Chiếu Slide</button>
+            <button id="btn-lab" onclick="switchTab('lab')">Thực Hành (Lab)</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- KHU VỰC SLIDE -->
+        <div id="slides-view">
+            <div class="slide-container">
+                <!-- Slide 1 -->
+                <div class="slide active">
+                    <h2>Đóng gói Docker và Chiến lược Triển khai GPU cho LLM Production</h2>
+                    <ul>
+                        <li><strong>Mục tiêu:</strong> Xây dựng môi trường triển khai nhất quán, bảo mật và hiệu năng cao.</li>
+                        <li><strong>Trọng tâm:</strong> Làm chủ NVIDIA Container Toolkit, tối ưu hóa kích thước image và cấu hình tài nguyên GPU.</li>
+                    </ul>
+                </div>
+                
+                <!-- Slide 2 -->
+                <div class="slide">
+                    <h2>Tại sao phải sử dụng Docker cho LLM?</h2>
+                    <ul>
+                        <li><strong>Nhất quán môi trường:</strong> Loại bỏ xung đột phiên bản CUDA, thư viện Python và Driver giữa các môi trường dev, staging và production.</li>
+                        <li><strong>Khả năng tái lập:</strong> Định nghĩa các phụ thuộc một lần và đảm bảo chúng hoạt động giống hệt nhau ở mọi nơi.</li>
+                        <li><strong>Tách biệt tài nguyên:</strong> Quản lý tài nguyên GPU và bộ nhớ độc lập cho từng mô hình.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="slide">
+                    <h2>NVIDIA Container Toolkit - Cầu nối GPU</h2>
+                    <ul>
+                        <li><strong>Chức năng:</strong> Cho phép môi trường Docker truy cập trực tiếp vào phần cứng GPU và trình điều khiển (Driver) của máy chủ vật lý.</li>
+                        <li><strong>Cơ chế:</strong> Ánh xạ các node thiết bị NVIDIA từ host vào bên trong container.</li>
+                        <li><strong>Lưu ý quan trọng:</strong> Phiên bản CUDA bên trong image (ví dụ: 12.1) phải tương thích với phiên bản Driver NVIDIA trên máy chủ (ví dụ: 525.60+).</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 4 -->
+                <div class="slide">
+                    <h2>Lựa chọn Base Image tối ưu</h2>
+                    <p><em>Mẹo: Luôn ghim (pin) tag phiên bản cụ thể thay vì dùng :latest để tránh lỗi bất ngờ.</em></p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Trường hợp sử dụng</th>
+                                <th>Base Image khuyến nghị</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Triển khai vLLM</td>
+                                <td>vllm/vllm-openai:v0.6.0</td>
+                            </tr>
+                            <tr>
+                                <td>Triển khai TGI</td>
+                                <td>ghcr.io/huggingface/text-generation-inference:2.3.0</td>
+                            </tr>
+                            <tr>
+                                <td>Tùy chỉnh (Custom)</td>
+                                <td>nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04</td>
+                            </tr>
+                            <tr>
+                                <td>Inference nhẹ</td>
+                                <td>nvidia/cuda:12.1.0-runtime-ubuntu22.04</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Slide 5 -->
+                <div class="slide">
+                    <h2>Tối ưu kích thước Image với Multi-Stage Builds</h2>
+                    <ul>
+                        <li><strong>Vấn đề:</strong> Image LLM thường rất lớn (10-20GB) do chứa các header phát triển CUDA và thư viện build.</li>
+                        <li><strong>Giải pháp:</strong> Sử dụng Multi-stage build để tách biệt giai đoạn xây dựng và giai đoạn chạy.</li>
+                        <li><strong>Giai đoạn 1 (Builder):</strong> Cài đặt công cụ build, biên dịch kernel CUDA và cài đặt thư viện.</li>
+                        <li><strong>Giai đoạn 2 (Runtime):</strong> Chỉ copy các file thực thi và thư viện cần thiết sang một image runtime nhỏ gọn hơn.</li>
+                        <li><strong>Kết quả:</strong> Có thể giảm dung lượng image xuống hơn 50%.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 6 -->
+                <div class="slide">
+                    <h2>Cấu hình Shared Memory (--shm-size)</h2>
+                    <ul>
+                        <li><strong>Tại sao cần?</strong> Các framework như vLLM và PyTorch sử dụng bộ nhớ chia sẻ (shared memory) để giao tiếp giữa các tiến trình tensor-parallel.</li>
+                        <li><strong>Rủi ro:</strong> Giá trị mặc định của Docker (64MB) sẽ gây crash hệ thống ngay khi bắt đầu xử lý đồng thời.</li>
+                        <li><strong>Khuyến nghị:</strong> Thiết lập ít nhất <code>16GB</code> cho cấu hình đơn GPU và <code>32GB</code> cho đa GPU.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 7 -->
+                <div class="slide">
+                    <h2>GPU Passthrough và Memory Utilization</h2>
+                    <ul>
+                        <li><strong>GPU Passthrough:</strong> Sử dụng flag <code>--gpus all</code> hoặc định danh thiết bị cụ thể để cấp quyền truy cập phần cứng cho container.</li>
+                        <li><strong>--gpu-memory-utilization:</strong> Tham số kiểm soát tỉ lệ VRAM mà engine sẽ chiếm dụng.</li>
+                        <li><strong>Khuyến nghị:</strong> Đặt ở mức <code>0.90</code> để dành lại 10% bộ đệm cho các overhead của CUDA và framework, tránh lỗi Out-of-Memory (OOM) khi có lưu lượng đột biến.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 8 -->
+                <div class="slide">
+                    <h2>Quản lý bộ nhớ Persistent (Volume Mounting)</h2>
+                    <ul>
+                        <li><strong>Quy tắc vàng:</strong> Không bao giờ nén (bake) trọng số mô hình trực tiếp vào Docker image.</li>
+                        <li><strong>Giải pháp:</strong> Gắn kết (mount) thư mục cache (ví dụ: <code>~/.cache/huggingface</code>) dưới dạng Volume.</li>
+                        <li><strong>Lợi ích:</strong>
+                            <ul>
+                                <li>Tránh tải lại mô hình (vài chục GB) mỗi khi khởi động lại container.</li>
+                                <li>Dễ dàng cập nhật phiên bản mô hình mà không cần build lại image.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Slide 9 -->
+                <div class="slide">
+                    <h2>Orchestration đa GPU: Tensor Parallelism</h2>
+                    <ul>
+                        <li><strong>Khi nào cần?</strong> Khi mô hình quá lớn không vừa một GPU đơn lẻ (ví dụ: Llama-3-70B cần 140GB ở FP16) hoặc cần giảm độ trễ (latency).</li>
+                        <li><strong>Tensor Parallelism (TP):</strong> Chia nhỏ các lớp của mô hình để xử lý song song trên nhiều GPU cùng lúc.</li>
+                        <li><strong>Cấu hình:</strong> Sử dụng tham số <code>--tensor-parallel-size</code> tương ứng với số lượng GPU được cấp phát.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 10 -->
+                <div class="slide">
+                    <h2>Yêu cầu kỹ thuật cho Đa GPU (Multi-GPU)</h2>
+                    <ul>
+                        <li><strong>--ipc=host:</strong> Yêu cầu bắt buộc để kích hoạt giao tiếp NCCL (NVIDIA Collective Communications Library) giữa các GPU.</li>
+                        <li><strong>Băng thông:</strong> Hiệu năng TP phụ thuộc lớn vào tốc độ kết nối nội bộ giữa các GPU (như NVLink hoặc InfiniBand).</li>
+                        <li><strong>Đồng nhất:</strong> Các GPU trong một cụm nên có cùng kiến trúc và dung lượng VRAM để tránh hiện tượng nghẽn cổ chai.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 11 -->
+                <div class="slide">
+                    <h2>Thiết lập Health Checks cho LLM Container</h2>
+                    <ul>
+                        <li><strong>Thách thức:</strong> LLM mất nhiều thời gian (30-180 giây) để nạp trọng số từ đĩa vào VRAM trước khi sẵn sàng phục vụ.</li>
+                        <li><strong>Cấu hình start_period:</strong> Thiết lập khoảng thời gian chờ (ví dụ: 120-300 giây) trong Docker Compose để tránh việc Docker giết container khi nó đang nạp mô hình.</li>
+                        <li><strong>Lệnh kiểm tra:</strong> Thường kiểm tra endpoint <code>/health</code> hoặc <code>/v1/models</code> của engine phục vụ.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 12 -->
+                <div class="slide">
+                    <h2>Kiến trúc Production Docker Compose</h2>
+                    <p>Một hệ thống triển khai tiêu chuẩn nên bao gồm:</p>
+                    <ul>
+                        <li><strong>Inference Engine (vLLM/TGI):</strong> Xử lý suy luận trên GPU.</li>
+                        <li><strong>API Gateway (FastAPI):</strong> Quản lý xác thực và hàng đợi.</li>
+                        <li><strong>Redis:</strong> Lưu trữ trạng thái task và hàng đợi thông điệp.</li>
+                        <li><strong>Prometheus:</strong> Thu thập các chỉ số (metrics) về VRAM và throughput.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 13 -->
+                <div class="slide">
+                    <h2>Bảo mật Container trong Production</h2>
+                    <ul>
+                        <li><strong>Non-root User:</strong> Tránh chạy container bằng quyền root để hạn chế rủi ro nếu container bị tấn công.</li>
+                        <li><strong>Secrets Management:</strong> Không để API Token (HuggingFace) trong biến môi trường của file compose; hãy sử dụng Docker Secrets hoặc file <code>.env</code> được bảo vệ.</li>
+                        <li><strong>Network Isolation:</strong> Chỉ công khai cổng (port) của API Gateway, giữ engine suy luận trong mạng nội bộ Docker.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 14 -->
+                <div class="slide">
+                    <h2>Xử lý các lỗi triển khai phổ biến</h2>
+                    <ul>
+                        <li><strong>Container OOM khi khởi động:</strong> Giảm gpu-memory-utilization hoặc bật Quantization (AWQ/GPTQ).</li>
+                        <li><strong>Mô hình không nạp được:</strong> Kiểm tra HuggingFace Token hoặc đường dẫn mount volume.</li>
+                        <li><strong>Lỗi NCCL/Hàng đa GPU:</strong> Kiểm tra flag <code>--ipc=host</code> và sự đồng nhất của driver giữa các GPU.</li>
+                        <li><strong>Inference chậm bất thường:</strong> Kiểm tra biến môi trường <code>CUDA_VISIBLE_DEVICES</code> xem có vô tình để trống khiến engine chạy trên CPU không.</li>
+                    </ul>
+                </div>
+
+                <!-- Slide 15 -->
+                <div class="slide">
+                    <h2>Tổng kết và Best Practices</h2>
+                    <ul>
+                        <li>Ưu tiên sử dụng <strong>Multi-stage builds</strong> để tối ưu tốc độ triển khai.</li>
+                        <li>Luôn cấu hình <strong>Shared Memory</strong> và <strong>Health Checks</strong> phù hợp với kích thước mô hình.</li>
+                        <li>Sử dụng <strong>Persistent Volumes</strong> để quản lý trọng số mô hình một cách linh hoạt.</li>
+                        <li>Giám sát các chỉ số VRAM (gpu_cache_usage_perc) để điều chỉnh quy mô hạ tầng kịp thời.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide Controls -->
+            <div class="controls">
+                <button id="prev-btn" onclick="changeSlide(-1)" disabled>❮ Trước</button>
+                <div id="slide-counter">1 / 15</div>
+                <button id="next-btn" onclick="changeSlide(1)">Tiếp ❯</button>
+            </div>
+        </div>
+
+        <!-- KHU VỰC THỰC HÀNH -->
+        <div id="lab-view">
+            <h2>Bài tập Thực hành DevOps: Viết Docker Compose cho vLLM</h2>
+            <p>Dựa trên lý thuyết đã học, hãy hoàn thiện file <code>docker-compose.yml</code> để triển khai mô hình LLM với GPU.</p>
+
+            <div class="exercise">
+                <h3>Bài 1: Cấu hình Tài nguyên và Volume</h3>
+                <p><strong>Yêu cầu:</strong> Bổ sung các thông số còn thiếu vào file cấu hình dưới đây để đảm bảo: <br>
+                1. Gắn tất cả GPU có sẵn vào container.<br>
+                2. Set bộ nhớ chia sẻ (shared memory) lên 16GB.<br>
+                3. Mount thư mục <code>./model_cache</code> trên máy host vào <code>/root/.cache/huggingface</code> trong container.</p>
+                
+                <button class="solution-btn" onclick="toggleSolution('sol-1')">Xem Đáp án</button>
+                <div id="sol-1" class="solution-content">
+<pre>
+<code class="keyword">version:</code> <code class="string">'3.8'</code>
+
+<code class="keyword">services:</code>
+  <code class="docker-cmd">vllm-server:</code>
+    <code class="keyword">image:</code> <code class="string">vllm/vllm-openai:v0.6.0</code>
+    <code class="keyword">ports:</code>
+      - <code class="string">"8000:8000"</code>
+    <code class="keyword">environment:</code>
+      - <code class="string">HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}</code>
+    <code class="keyword">command:</code> <code class="string">--model meta-llama/Llama-3-8B-Instruct --gpu-memory-utilization 0.90</code>
+    
+    <code class="comment"># --- ĐÁP ÁN BẮT ĐẦU TỪ ĐÂY ---</code>
+    <code class="keyword">deploy:</code>
+      <code class="keyword">resources:</code>
+        <code class="keyword">reservations:</code>
+          <code class="keyword">devices:</code>
+            - <code class="keyword">driver:</code> <code class="string">nvidia</code>
+              <code class="keyword">count:</code> <code class="string">all</code>
+              <code class="keyword">capabilities:</code> [<code class="string">gpu</code>]
+              
+    <code class="keyword">shm_size:</code> <code class="string">'16gb'</code>
+    
+    <code class="keyword">volumes:</code>
+      - <code class="string">./model_cache:/root/.cache/huggingface</code>
+</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JS Cho Slideshow
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const counter = document.getElementById('slide-counter');
+
+        function updateControls() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if(index === currentSlide) slide.classList.add('active');
+            });
+            
+            counter.innerText = `${currentSlide + 1} / ${slides.length}`;
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateControls();
+        }
+
+        // JS Cho Tabs
+        function switchTab(tabName) {
+            document.getElementById('btn-slides').classList.remove('active');
+            document.getElementById('btn-lab').classList.remove('active');
+            
+            if (tabName === 'slides') {
+                document.getElementById('btn-slides').classList.add('active');
+                document.getElementById('slides-view').style.display = 'flex';
+                document.getElementById('lab-view').style.display = 'none';
+            } else {
+                document.getElementById('btn-lab').classList.add('active');
+                document.getElementById('slides-view').style.display = 'none';
+                document.getElementById('lab-view').style.display = 'block';
+            }
+        }
+
+        // JS Cho Exercises
+        function toggleSolution(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === "block") {
+                el.style.display = "none";
+            } else {
+                el.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>
