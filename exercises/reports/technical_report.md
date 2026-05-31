@@ -1,6 +1,6 @@
 # Báo cáo Kỹ thuật: Khóa học LLM Engineering
 
-**Giảng viên:** Vũ Minh Khang
+**Giảng viên:** [Điền tên giảng viên]
 **Đối tượng:** Học sinh THPT
 **Hardware:** NVIDIA T4 (16GB VRAM)
 **Thời lượng:** 8 buổi thực hành
@@ -276,7 +276,7 @@ PyTorch | vLLM | FastAPI | Redis | Docker | NVIDIA T4
 
 ## Liên hệ
 
-**Giảng viên:** Vũ Minh Khang
+**Giảng viên:** [Điền tên giảng viên]
 **Email:** [Email]
 **GitHub:** [GitHub Link]
 

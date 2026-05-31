@@ -8,7 +8,7 @@
 | Thông tin | Chi tiết |
 |-----------|----------|
 | **Tên khóa học** | LLM Engineering - Thực hành LLM Production |
-| **Giảng viên** | Vũ Minh Khhang |
+| **Giảng viên** | [Điền tên giảng viên] |
 | **Đối tượng** | Học sinh THPT |
 | **Hardware** | NVIDIA T4 (16GB VRAM) |
 | **Thời lượng** | 8 buổi thực hành |

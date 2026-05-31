@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | **Họ và tên** | [Điền tên] |
-| **Giảng viên hướng dẫn** | Vũ Minh Khang |
+| **Giảng viên hướng dẫn** | [Điền tên giảng viên] |
 | **Khóa học** | LLM Engineering — 8 buổi thực hành |
 | **Hardware** | NVIDIA T4 (16GB VRAM) |
 | **Ngày thực hiện** | [Điền ngày] |
